@@ -28,7 +28,6 @@ public class Base {
     public Terminal findFreeTerminal(Van van) {
 
         if (van.isPerishable()) {
-            lock.lock();
             for (Terminal terminal : base) {
                 while (true) {
 
@@ -45,7 +44,6 @@ public class Base {
                     return terminal;
                 }
             }
-            lock.unlock();
         }
         return new Terminal(-1);
     }

@@ -32,7 +32,7 @@ public class Terminal {
 
         System.out.println(van.getName() + " processing on terminal N" + this.getId() + "...");
         try {
-            TimeUnit.SECONDS.sleep(5);
+            TimeUnit.MILLISECONDS.sleep(100);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

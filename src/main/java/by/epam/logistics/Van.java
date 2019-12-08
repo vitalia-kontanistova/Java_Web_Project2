@@ -51,19 +51,17 @@ public class Van implements Runnable {
 
             if (currentTerminal.getId() > 0) {
                 currentTerminal.process(this);
-                lock.unlock();
+
             } else {
                 TimeUnit.MILLISECONDS.sleep(10);
-                nextTry();
-//                return;
+                lock.unlock();
+                run();
             }
+            lock.unlock();
             System.out.println(name + " release base.");
         } catch (NullPointerException | InterruptedException e) {
             e.printStackTrace();
         }
     }
 
-    public void nextTry() {
-        run();
-    }
 }
