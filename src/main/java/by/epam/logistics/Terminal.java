@@ -1,12 +1,14 @@
 package by.epam.logistics;
 
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Terminal {
     private int id;
-    private boolean free;
+    private AtomicBoolean free;
     private Lock lock;
 
 
@@ -14,31 +16,33 @@ public class Terminal {
         return id;
     }
 
-    public boolean isFree() {
+    public AtomicBoolean isFree() {
         return free;
     }
 
-    public void setFree(boolean free) {
+    public void setFree(AtomicBoolean free) {
         this.free = free;
     }
 
     public Terminal(int id) {
         this.id = id;
-        this.free = true;
+        this.free = new AtomicBoolean(true);
+        lock = new ReentrantLock();
     }
 
     public void process(Van van) {
-        lock = van.getLock();
         System.out.println(van.getName() + " processing on terminal N" + this.getId() + "...");
         try {
-            TimeUnit.SECONDS.sleep(1);
+            Random random = new Random();
+            TimeUnit.MILLISECONDS.sleep(random.nextInt(1500));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        lock.lock();
-        this.setFree(true);
-        lock.unlock();
-
+        if (!isFree().get()) {
+            lock.lock();
+            this.setFree(new AtomicBoolean(true));
+            lock.unlock();
+        }
     }
 }

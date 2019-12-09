@@ -1,4 +1,4 @@
-package by.epam.logistics;
+package by.epam.logistics.practice;
 
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;

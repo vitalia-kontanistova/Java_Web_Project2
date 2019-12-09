@@ -1,61 +1,67 @@
 package by.epam.logistics;
 
-import java.util.ArrayList;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Base implements Runnable {
     private Lock lock;
 
-//    private Condition condition;
+    private Thread baseThread;
     private List<Terminal> terminals;
-    private Queue<Van> vans;
+    private Deque<Van> vans;
+
 
     public Base(List<Terminal> terminals) {
-        this.terminals =  terminals;
+        this.terminals = terminals;
 
         lock = new ReentrantLock();
+        vans = new LinkedList<>();
+//        baseThread = new Thread(this);
+//        baseThread.run();//////////////////////////
     }
 
 
+    public void addVan(Van van) {
+        if (van.isPerishable().get()) {
+            lock.lock();
+            vans.addFirst(van);
+            lock.unlock();
 
-    public Terminal findFreeTerminal(Van van) {
-        lock = van.getLock();
-//        condition = van.getCondition();
-
-        if (van.isPerishable()) {
-            for (Terminal terminal : terminals) {
-                while (true) {
-
-
-                    if (terminal.isFree()) {
-                        lock.lock();//
-                        terminal.setFree(false);
-//                        condition.signal();//
-                        lock.unlock();//
-                        return terminal;
-                    }
-                }
-            }
         } else {
-            for (Terminal terminal : terminals) {
-
-                if (terminal.isFree()) {
-                    lock.lock();
-                    terminal.setFree(false);
-//                    condition.signal();//
-                    lock.unlock();
-                    return terminal;
-                }
-            }
+            lock.lock();
+            vans.addLast(van);
+            lock.unlock();
         }
-        return new Terminal(-1);
+        new Thread(this).start();
+    }
+
+
+    public Deque<Van> getVans() {
+        return vans;
     }
 
     @Override
     public void run() {
-
+        lock.lock();
+        try {
+            while (!vans.isEmpty()) {
+                Van van = vans.pollFirst();
+                for (Terminal terminal : terminals) {
+                    if (terminal.isFree().get()) {
+                        terminal.process(van);
+                        System.out.println(van.getName() + " release the base.");
+                        lock.unlock();
+                        return;
+                    }
+                }
+                lock.unlock();
+                Thread.yield();
+            }
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
     }
 }
