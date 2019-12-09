@@ -34,7 +34,7 @@ public class Terminal {
         System.out.println(van.getName() + " processing on terminal N" + this.getId() + "...");
         try {
             Random random = new Random();
-            TimeUnit.MILLISECONDS.sleep(random.nextInt(1500));
+            TimeUnit.MILLISECONDS.sleep(random.nextInt(100));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

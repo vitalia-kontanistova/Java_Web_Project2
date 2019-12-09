@@ -14,12 +14,13 @@ public class Van implements Runnable {
     private Thread threadVan;
     private static Lock lock;
 
-    public Van(String name, AtomicBoolean perishable, Base base) {
+    public Van(String name, AtomicBoolean perishable) {
         this.name = name;
         this.perishable = perishable;
-        this.base = base;
-        threadVan = new Thread(this);
+        this.base = Base.getInstance();
         lock = new ReentrantLock();
+
+        threadVan = new Thread(this);
         threadVan.start();
     }
 
