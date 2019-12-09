@@ -3,7 +3,7 @@ package by.epam.logistics;
 
 public class Main {
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
         Base base = new Base(new Terminal(1), new Terminal(2), new Terminal(3), new Terminal(4), new Terminal(5));
 
         Van van1 = new Van("Van1", false, base);

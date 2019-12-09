@@ -1,6 +1,8 @@
 package by.epam.logistics;
 
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -11,11 +13,11 @@ public class Van implements Runnable {
 
     private Thread threadVan;
     private static Lock lock;
+//    private Condition condition;
 
     public Van(String name, boolean perishable) {
         this.name = name;
         this.perishable = perishable;
-        lock = new ReentrantLock();
         threadVan = new Thread(this);
     }
 
@@ -41,24 +43,43 @@ public class Van implements Runnable {
         return threadVan;
     }
 
+    public Lock getLock() {
+        return lock;
+    }
+
+//    public Condition getCondition() {
+//        return condition;
+//    }
+
     @Override
     public void run() {
         try {
+            boolean success = false;
             System.out.println(name + " is arriving to the base.");
 
-            lock.lock();
             Terminal currentTerminal = base.findFreeTerminal(this);
+            lock.lock();
 
             if (currentTerminal.getId() > 0) {
                 currentTerminal.process(this);
+                success = true;
+                lock.unlock();
+                TimeUnit.SECONDS.sleep(1);
 
             } else {
                 TimeUnit.MILLISECONDS.sleep(10);
+//                condition.await();
+                currentTerminal = base.findFreeTerminal(this);//
+                if (currentTerminal.getId() > 0) {
+                    currentTerminal.process(this);//
+                    success = true;
+                }
                 lock.unlock();
-                run();
+//                run();
             }
-            lock.unlock();
-            System.out.println(name + " release base.");
+            if (success) {
+                System.out.println(name + " release base.");
+            }
         } catch (NullPointerException | InterruptedException e) {
             e.printStackTrace();
         }

@@ -2,49 +2,60 @@ package by.epam.logistics;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class Base {
+public class Base implements Runnable {
     private Lock lock;
-    private List<Terminal> base;
 
-    public Base(Terminal t1, Terminal t2, Terminal t3, Terminal t4, Terminal t5) {
-        base = new ArrayList<>();
-        if (t1 != null)
-            base.add(t1);
-        if (t2 != null)
-            base.add(t2);
-        if (t3 != null)
-            base.add(t3);
-        if (t4 != null)
-            base.add(t4);
-        if (t5 != null)
-            base.add(t5);
+//    private Condition condition;
+    private List<Terminal> terminals;
+    private Queue<Van> vans;
+
+    public Base(List<Terminal> terminals) {
+        this.terminals =  terminals;
 
         lock = new ReentrantLock();
     }
 
+
+
     public Terminal findFreeTerminal(Van van) {
+        lock = van.getLock();
+//        condition = van.getCondition();
 
         if (van.isPerishable()) {
-            for (Terminal terminal : base) {
+            for (Terminal terminal : terminals) {
                 while (true) {
 
+
                     if (terminal.isFree()) {
+                        lock.lock();//
                         terminal.setFree(false);
+//                        condition.signal();//
+                        lock.unlock();//
                         return terminal;
                     }
                 }
             }
         } else {
-            for (Terminal terminal : base) {
+            for (Terminal terminal : terminals) {
+
                 if (terminal.isFree()) {
+                    lock.lock();
                     terminal.setFree(false);
+//                    condition.signal();//
+                    lock.unlock();
                     return terminal;
                 }
             }
         }
         return new Terminal(-1);
+    }
+
+    @Override
+    public void run() {
+
     }
 }

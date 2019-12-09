@@ -25,14 +25,13 @@ public class Terminal {
     public Terminal(int id) {
         this.id = id;
         this.free = true;
-        lock = new ReentrantLock();
     }
 
     public void process(Van van) {
-
+        lock = van.getLock();
         System.out.println(van.getName() + " processing on terminal N" + this.getId() + "...");
         try {
-            TimeUnit.MILLISECONDS.sleep(100);
+            TimeUnit.SECONDS.sleep(1);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -40,5 +39,6 @@ public class Terminal {
         lock.lock();
         this.setFree(true);
         lock.unlock();
+
     }
 }
