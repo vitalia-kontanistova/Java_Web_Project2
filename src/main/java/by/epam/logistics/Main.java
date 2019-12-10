@@ -15,10 +15,7 @@ public class Main {
         } catch (ServiceException e) {
             e.printStackTrace();
         }
-
         base.processQueue();
-
     }
-
 }
 

@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class Base {
+public class Base{
     private Semaphore terminals;
     private Deque<Van> vans;
     private Lock locker;
@@ -64,4 +64,5 @@ public class Base {
             e.printStackTrace();
         }
     }
+
 }
