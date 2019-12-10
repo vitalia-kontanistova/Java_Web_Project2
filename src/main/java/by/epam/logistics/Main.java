@@ -1,11 +1,6 @@
 package by.epam.logistics;
 
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class Main {
     public static void main(String[] args) {
