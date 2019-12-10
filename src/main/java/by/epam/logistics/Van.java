@@ -29,25 +29,31 @@ public class Van implements Runnable {
         this.terminals = base.getTerminals();
         this.name = name;
         this.perishable = perishable;
-        base.addVan(this);
         this.vanThread = new Thread(this);
+        base.addVan(this);
+
     }
 
     @Override
     public void run() {
         try {
+
             Random random = new Random();
-            TimeUnit.MILLISECONDS.sleep(random.nextInt(1500));
+            TimeUnit.MILLISECONDS.sleep(random.nextInt(1000));
             System.out.println(this.getName() + " arrive and waiting for terminal");
             terminals.acquire();
 
-            System.out.println(this.getName() + " processing...");
-            TimeUnit.MILLISECONDS.sleep(random.nextInt(1500));
+            base.processVan(this);
 
             System.out.println(this.getName() + " release base");
             terminals.release();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public String toString() {
+        return "" + name;
     }
 }

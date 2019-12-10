@@ -23,7 +23,7 @@ public class FileManipulator {
     }
 
 
-    public List<String> extractEntriesFromFile(String requestToPropFile) throws DAOException {
+    public List<String> extractEntriesFromFile() throws DAOException {
 
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(path))) {
             List<String> aLLEntries = new ArrayList<>();

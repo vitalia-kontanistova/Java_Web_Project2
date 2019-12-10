@@ -1,8 +1,10 @@
 package by.epam.logistics;
 
+import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.LinkedList;
+import java.util.Random;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -16,7 +18,7 @@ public class Base {
     private Base() {
         this.terminals = new Semaphore(5);
         locker = new ReentrantLock();
-        vans = new LinkedList<>();
+        vans = new ArrayDeque<>();
     }
 
     public static Base getInstance() {
@@ -35,15 +37,13 @@ public class Base {
     }
 
     public void addVan(Van van) {
+        locker.lock();
         if (van.getPerishable().get()) {
-            locker.lock();
             vans.addFirst(van);
-            locker.unlock();
         } else {
-            locker.lock();
             vans.addLast(van);
-            locker.unlock();
         }
+        locker.unlock();
     }
 
     public void processQueue() {
@@ -52,6 +52,16 @@ public class Base {
             Van van = vans.pollFirst();
             van.getVanThread().start();
             locker.unlock();
+        }
+    }
+
+    public void processVan(Van van) {
+        try {
+            Random random = new Random();
+            System.out.println(van.getName() + " processing...");
+            TimeUnit.MILLISECONDS.sleep(random.nextInt(10000));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }
