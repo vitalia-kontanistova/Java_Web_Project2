@@ -5,19 +5,22 @@ import java.util.Deque;
 import java.util.Random;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class Base{
+public class Base {
     private Semaphore terminals;
     private Deque<Van> vans;
-    private Lock locker;
+    private Lock lock;
+    private Lock vanLock;
+    private Condition vanCondtion;
 
     private static Base instance;
 
     private Base() {
         this.terminals = new Semaphore(5);
-        locker = new ReentrantLock();
+        lock = new ReentrantLock();
         vans = new ArrayDeque<>();
     }
 
@@ -37,21 +40,27 @@ public class Base{
     }
 
     public void addVan(Van van) {
-        locker.lock();
+        lock.lock();
         if (van.getPerishable().get()) {
             vans.addFirst(van);
         } else {
             vans.addLast(van);
         }
-        locker.unlock();
+        lock.unlock();
     }
 
     public void processQueue() {
         while (!vans.isEmpty()) {
-            locker.lock();
+            lock.lock();
             Van van = vans.pollFirst();
-            van.getVanThread().start();
-            locker.unlock();
+            vanLock = van.getLock();
+            vanCondtion = van.getCondition();
+
+            vanLock.lock();
+            vanCondtion.signal();
+
+            vanLock.unlock();
+            lock.unlock();
         }
     }
 
@@ -59,10 +68,9 @@ public class Base{
         try {
             Random random = new Random();
             System.out.println(van.getName() + " processing...");
-            TimeUnit.MILLISECONDS.sleep(random.nextInt(10000));
+            TimeUnit.MILLISECONDS.sleep(random.nextInt(1000));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
-
 }

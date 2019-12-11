@@ -4,6 +4,9 @@ import java.util.Random;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Van implements Runnable {
     private Semaphore terminals;
@@ -11,6 +14,8 @@ public class Van implements Runnable {
     private AtomicBoolean perishable;
     private Base base;
     private Thread vanThread;
+    Lock lock;
+    Condition condition;
 
     public Thread getVanThread() {
         return vanThread;
@@ -29,17 +34,27 @@ public class Van implements Runnable {
         this.terminals = base.getTerminals();
         this.name = name;
         this.perishable = perishable;
-        this.vanThread = new Thread(this);
-        base.addVan(this);
+        this.lock = new ReentrantLock();
+        this.condition = lock.newCondition();
+    }
 
+    public Lock getLock() {
+        return lock;
+    }
+
+
+    public Condition getCondition() {
+        return condition;
     }
 
     @Override
     public void run() {
         try {
+            base.addVan(this);
+            lock.lock();
+            condition.await();
+            lock.unlock();
 
-            Random random = new Random();
-            TimeUnit.MILLISECONDS.sleep(random.nextInt(1000));
             System.out.println(this.getName() + " arrive and waiting for terminal");
             terminals.acquire();
 

@@ -12,6 +12,9 @@ public class Main {
 
         try {
             List<Van> vans = VanServiceImpl.getInstance().createFromFile(base);
+            for (Van van : vans) {
+                new Thread(van).start();
+            }
         } catch (ServiceException e) {
             e.printStackTrace();
         }
